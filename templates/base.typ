@@ -192,6 +192,13 @@
   })
 }
 
+// 글꼴 목록의 대표 이름. `covers`로 숫자·라틴만 맡는 항목은 건너뛴다
+#let font-name(fs) = {
+  let fs = if type(fs) == array { fs } else { (fs,) }
+  let main = fs.filter(f => type(f) != dictionary or not ("covers" in f))
+  let f = if main.len() > 0 { main.first() } else { fs.first() }
+  if type(f) == dictionary { f.name } else { f }
+}
 #let colophon(meta, t) = {
   pagebreak(weak: true)
   page(header: none, footer: none, {  // 판권면: 러닝헤드·쪽번호 생략(러닝 시스템 규약)
@@ -207,9 +214,10 @@
     linebreak()
     if "date" in meta [초판 1쇄 발행 #meta.date]
     linebreak()
-    [펴낸곳 bookforge · 조판 bookforge 자동 조판 파이프라인]
+    [펴낸곳 #meta.at("publisher", default: "bookforge") · 조판 bookforge 자동 조판 파이프라인]
     linebreak()
-    [본문 서체 #merged((:)).body-font.at(0) · 표제 서체 #merged((:)).display-font.at(0)]
+    // 기본 토큰이 아니라 이 책 테마의 글꼴을 적는다(practical 본문은 Noto Serif KR인데 Pretendard로 찍혔다)
+    [본문 서체 #font-name(merged(t).body-font) · 표제 서체 #font-name(merged(t).display-font)]
     linebreak()
     [이 책의 내용은 조사 시점 기준이며, 인용·수치는 본문 표기 출처를 따릅니다.]
   })
