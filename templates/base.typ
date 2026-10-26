@@ -150,8 +150,12 @@
   let t = merged(t)
   // breakable — unbreakable 블록 속 긴 표는 넘친 행이 쪽 하단에 0높이로 겹친다(issue #7)
   block(breakable: true, above: 1.3em, below: 1.3em, width: 100%, {
+    // 표 묶음 안은 본문 문단 간격을 따르지 않는다. 블록 간격이 par.spacing을 따르므로
+    // 격자형 본문 간격(practical 1행+행송)이 캡션·표·자료 줄 사이에 그대로 끼던 것을 막는다.
+    set par(spacing: 0.65em)
     if caption != none {
-      context {
+      // sticky: 캡션은 표 첫 행과 같은 면에 둔다. 면 끝에 캡션만 남고 표가 다음 면으로 가던 결함.
+      block(sticky: true, below: 2mm, context {
         tbl-counter.step()
         let n = chapter-state.get().num
         let m = tbl-counter.get().first() + 1
@@ -159,8 +163,7 @@
         text(font: t.sans-font, size: 8.5pt, weight: "semibold", fill: t.brand, lab)
         h(0.6em)
         text(font: t.sans-font, size: 8.5pt, fill: t.ink, caption)
-      }
-      v(2mm)
+      })
     }
     body
     if source != none {
